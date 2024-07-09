@@ -5,7 +5,7 @@ void main() {
 }
 
 class TicTacToeApp extends StatefulWidget {
-  const TicTacToeApp({Key? key}) : super(key: key);
+  const TicTacToeApp({super.key});
 
   @override
   _TicTacToeAppState createState() => _TicTacToeAppState();
@@ -46,8 +46,7 @@ class TicTacToeGame extends StatefulWidget {
   final ThemeMode initialThemeMode;
 
   const TicTacToeGame(
-      {Key? key, required this.toggleTheme, required this.initialThemeMode})
-      : super(key: key);
+      {super.key, required this.toggleTheme, required this.initialThemeMode});
 
   @override
   _TicTacToeGameState createState() => _TicTacToeGameState();
@@ -127,22 +126,30 @@ class _TicTacToeGameState extends State<TicTacToeGame> {
     });
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tic Tac Toe'),
-        actions: [
-          Row(
-            children: [
-              const Text('Dark Mode'),
-              Switch(
-                value: widget.initialThemeMode == ThemeMode.dark,
-                onChanged: widget.toggleTheme,
-              ),
-            ],
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48.0),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Dark Mode'),
+                Switch(
+                  value: Theme.of(context).brightness == Brightness.dark,
+                  onChanged: (bool value) {
+                    widget.toggleTheme(value);
+                  },
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -205,21 +212,46 @@ class _TicTacToeGameState extends State<TicTacToeGame> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: _resetGame,
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Reset Game'),
-                        ),
-                        const SizedBox(width: 20),
-                        ElevatedButton.icon(
-                          onPressed: _resetScores,
-                          icon: const Icon(Icons.scoreboard),
-                          label: const Text('Reset Scores'),
-                        ),
-                      ],
+                    LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        if (constraints.maxWidth > 400) {
+                          // For larger screens, keep buttons side by side
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: _resetGame,
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Reset Game'),
+                              ),
+                              const SizedBox(width: 20),
+                              ElevatedButton.icon(
+                                onPressed: _resetScores,
+                                icon: const Icon(Icons.scoreboard),
+                                label: const Text('Reset Scores'),
+                              ),
+                            ],
+                          );
+                        } else {
+                          // For smaller screens, stack buttons vertically
+                          return Column(
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: _resetGame,
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Reset Game'),
+                              ),
+                              const SizedBox(height: 10),
+                              ElevatedButton.icon(
+                                onPressed: _resetScores,
+                                icon: const Icon(Icons.scoreboard),
+                                label: const Text('Reset Scores'),
+                              ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
